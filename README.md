@@ -1,5 +1,4 @@
 # Proyecto Servicio Web - Battle Tanks
-===================
 
 Repositorio del servidor(Servicio Web) encargado de manejar la lógica de creación de partidas y jugadores.
 ----------
