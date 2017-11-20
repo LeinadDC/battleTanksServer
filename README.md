@@ -60,7 +60,8 @@ python3 server.py
 
 ## Estructura
 
-Descripción estructura
+Repositorio del cliente:
+* [BattleTanks-Client](https://github.com/LeinadDC/battleTanks) - Cliente Unity
 
 ## Funcionamiento
 
