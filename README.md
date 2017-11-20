@@ -57,3 +57,16 @@ python3 server.py
 * [Flask](http://flask.pocoo.org/) - Python microframework
 * [Unity](https://unity3d.com/) - 3D/2D Game Engine
 * [MongoDB](https://www.mongodb.com/) - NoSQL Database
+
+## Estructura
+
+Descripción estructura
+
+## Funcionamiento
+
+Descripción funcionamiento
+
+
+## Autor
+* **Daniel Castellano** - *Trabajo Inicial* - [LeinadDC](https://github.com/LeinadDC/)
+
