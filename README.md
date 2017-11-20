@@ -51,3 +51,9 @@ Ejecución (Si todo sale bien)
 ```
 python3 server.py
 ```
+
+## Hecho con
+
+* [Flask](http://flask.pocoo.org/) - Python microframework
+* [Unity](https://unity3d.com/) - 3D/2D Game Engine
+* [MongoDB](https://www.mongodb.com/) - NoSQL Database
