@@ -5,11 +5,11 @@ app = Flask(__name__)
 
 connect('test')
 
-
-
 class Player(EmbeddedDocument):
-    playerId = StringField(required=True, max_length=36)
-    tankLife = IntField(min_value=1)
+    playerId = StringField(required=False, max_length=36)
+    tankLife = IntField(required=False)
+    #playerId = StringField(required=True, max_length=36)
+    #tankLife = IntField(min_value=1)
 
 class GameSession(Document):
     gameId = StringField(required=True,max_length=36)
@@ -23,20 +23,25 @@ class Action(Document):
     actionType = StringField(required=True,max_length=10)
     movementCords = StringField(max_length=10)
 
-
 @app.route('/')
 def hello():
     return render_template('index.html')
 
 @app.route('/gameSessionInit', methods=['POST'])
-def testPost():
-    test = request.form.to_dict()
-    loaded_r = {}
-    for key, value in test.items():
+def postSession():
+    createdSession = createSession()
+    return createdSession
+
+
+def createSession():
+    sessionDict = request.form.to_dict()
+    parsedSession = {}
+    for key, value in sessionDict.items():
         dict = key
-        loaded_r = json.loads(key)
-    saveSession(loaded_r)
-    return "Sesion creada"
+        parsedSession = json.loads(key)
+    saveSession(parsedSession)
+    return parsedSession
+
 
 def saveSession(jsonData):
     gameSession = GameSession(
