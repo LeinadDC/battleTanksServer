@@ -11,14 +11,11 @@ class Player(EmbeddedDocument):
     playerId = StringField(required=True, max_length=36)
     tankLife = IntField(min_value=1)
 
-class GameSession(EmbeddedDocument):
+class GameSession(Document):
     gameId = StringField(required=True,max_length=36)
     players = ListField(EmbeddedDocumentField(Player))
     gameState = StringField(max_length=10)
     gameWinner = StringField(max_length=25)
-
-class Items(Document):
-    gameSession = ListField(EmbeddedDocumentField(GameSession))
 
 class Action(Document):
     playerId = StringField(required=True,max_length=36)
@@ -29,7 +26,7 @@ class Action(Document):
 
 @app.route('/')
 def hello():
-    return "Hello world"
+    return render_template('index.html')
 
 @app.route('/gameSessionInit', methods=['POST'])
 def testPost():
@@ -38,21 +35,31 @@ def testPost():
     for key, value in test.items():
         dict = key
         loaded_r = json.loads(key)
-    print(loaded_r['Items'][0]['gameState'])
-    print(loaded_r ['Items'][0]['players'])
-    return "DATA OK"
+    saveSession(loaded_r)
+    return "Sesion creada"
 
-@app.route('/testGet/<playerId>', methods=['GET'])
-def testGet(playerId):
-
-    return "DATA GET"
-
-
-def createGameSession(jsonData):
-    session = Items(
-        gameSession = jsonData["Items"]
+def saveSession(jsonData):
+    gameSession = GameSession(
+        gameId = jsonData['Items'][0]['gameId'],
+        players = (jsonData['Items'][0]['players']),
+        gameState=jsonData['Items'][0]['gameState'],
+        gameWinner = jsonData['Items'][0]['gameWinner']
     )
-    session.save()
+    gameSession.save()
+
+def findSession(gameId):
+    sessionObject = GameSession.objects(gameId = gameId).first()
+    parsedSession = sessionObject.to_mongo()
+    serealizedSession = parsedSession.to_dict()
+    return serealizedSession
+
+@app.route('/getGameSessions/<sessionId>', methods=['GET'])
+def getSession(sessionId):
+    session = findSession(sessionId)
+    del session['_id']
+    print(session)
+    return jsonify(session)
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
