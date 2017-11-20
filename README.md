@@ -17,6 +17,37 @@ Flask
 pymongo
 mongoengine
 Python 3.5
+Git
 ```
 
+### Instalación y ejecución
 
+Creación del virutalenv para el proyecto
+
+```
+virtual env
+```
+
+Clonación del repositorio
+
+```
+git clone https://github.com/LeinadDC/battleTanksServer.git
+```
+
+Activación del env
+
+```
+. env/bin/activate
+```
+
+Instalación de paquetes requeridos
+
+```
+pip3 install -r requeriments.txt
+```
+
+Ejecución (Si todo sale bien)
+
+```
+python3 server.py
+```
