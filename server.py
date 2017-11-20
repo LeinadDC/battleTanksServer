@@ -32,15 +32,41 @@ def postSession():
     createdSession = createSession()
     return createdSession
 
+@app.route('/sessionUpdate/<sessionId>', methods=['PUT'])
+def putSession(sessionId):
+    sessionDict = request.form.to_dict()
+    updatedSession = updateSession(sessionId,sessionDict)
+    return updatedSession
+
+@app.route('/getGameSessions/<sessionId>', methods=['GET'])
+def getSession(sessionId):
+    session = findSession(sessionId)
+    del session['_id']
+    print(session)
+    return jsonify(session)
+
 
 def createSession():
     sessionDict = request.form.to_dict()
+    parsedSession = converToJson(sessionDict)
+    return parsedSession
+
+
+def converToJson(sessionDict):
     parsedSession = {}
     for key, value in sessionDict.items():
         dict = key
         parsedSession = json.loads(key)
     saveSession(parsedSession)
     return parsedSession
+
+
+def updateSession(gameId,jsonData):
+    parsedJson = converToJson(jsonData)
+    sessionObject = GameSession.objects(gameId = gameId).update(players=parsedJson['Items'][0]['players'])
+    parsedSession = sessionObject.to_mongo()
+    serealizedSession = parsedSession.to_dict()
+    return serealizedSession
 
 
 def saveSession(jsonData):
@@ -57,13 +83,6 @@ def findSession(gameId):
     parsedSession = sessionObject.to_mongo()
     serealizedSession = parsedSession.to_dict()
     return serealizedSession
-
-@app.route('/getGameSessions/<sessionId>', methods=['GET'])
-def getSession(sessionId):
-    session = findSession(sessionId)
-    del session['_id']
-    print(session)
-    return jsonify(session)
 
 
 if __name__ == '__main__':
