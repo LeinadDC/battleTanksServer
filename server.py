@@ -30,9 +30,12 @@ def hello():
 @app.route('/gameSessionInit', methods=['POST'])
 def postSession():
     createdSession = createSession()
-    return createdSession
+    saveSession(createdSession)
+    print("PRIMER POST")
+    print (createdSession)
+    return jsonify(createdSession)
 
-@app.route('/sessionUpdate/<sessionId>', methods=['PUT'])
+@app.route('/sessionUpdate/<sessionId>', methods=['POST'])
 def putSession(sessionId):
     sessionDict = request.form.to_dict()
     updatedSession = updateSession(sessionId,sessionDict)
@@ -42,6 +45,7 @@ def putSession(sessionId):
 def getSession(sessionId):
     session = findSession(sessionId)
     del session['_id']
+    print("ULTIMO GET")
     print(session)
     return jsonify(session)
 
@@ -57,17 +61,19 @@ def converToJson(sessionDict):
     for key, value in sessionDict.items():
         dict = key
         parsedSession = json.loads(key)
-    saveSession(parsedSession)
     return parsedSession
 
 
 def updateSession(gameId,jsonData):
     parsedJson = converToJson(jsonData)
-    sessionObject = GameSession.objects(gameId = gameId).update(players=parsedJson['Items'][0]['players'])
-    parsedSession = sessionObject.to_mongo()
-    serealizedSession = parsedSession.to_dict()
-    return serealizedSession
-
+    print("ESTE ES EL DE UPDATE")
+    print(parsedJson)
+    ##Mejorar este método de actualización
+    GameSession.objects(gameId = gameId).update(players=parsedJson['Items'][0]['players'])
+    GameSession.objects(gameId = gameId).update(gameState=parsedJson['Items'][0]['gameState'])
+    serealizedSession = findSession(gameId)
+    del serealizedSession['_id']
+    return jsonify(serealizedSession)
 
 def saveSession(jsonData):
     gameSession = GameSession(
