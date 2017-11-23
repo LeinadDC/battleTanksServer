@@ -8,8 +8,6 @@ connect('test')
 class Player(EmbeddedDocument):
     playerId = StringField(required=False, max_length=36)
     tankLife = IntField(required=False)
-    #playerId = StringField(required=True, max_length=36)
-    #tankLife = IntField(min_value=1)
 
 class GameSession(Document):
     gameId = StringField(required=True,max_length=36)
@@ -67,6 +65,8 @@ def converToJson(sessionDict):
 def updateSession(gameId,jsonData):
     parsedJson = converToJson(jsonData)
     print("ESTE ES EL DE UPDATE")
+    print(GameSession.objects(gameId = gameId).players.count())
+    GameSession.objects()
     print(parsedJson)
     ##Mejorar este método de actualización
     GameSession.objects(gameId = gameId).update(players=parsedJson['Items'][0]['players'])
