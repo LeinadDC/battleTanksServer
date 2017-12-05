@@ -1,16 +1,29 @@
 # -*- coding: utf-8 -*-
 from flask import Flask, render_template, request,jsonify,json
 from flask_mongoengine import MongoEngine
+from flask_jwt_extended import (
+    JWTManager, jwt_required, create_access_token,
+    jwt_refresh_token_required, create_refresh_token,
+    get_jwt_identity
+)
+
 from mongoengine import *
 from werkzeug.security import *
 import wtforms_json
 from flask_login import LoginManager, UserMixin
 from wtforms import Form, BooleanField, StringField, PasswordField, validators
 
+import uuid
+
 from db import connection
+
+
+
 
 app = Flask(__name__)
 app.config.from_object('config')
+app.config['JWT_SECRET_KEY'] = 'super-secret'
+jwt = JWTManager(app)
 wtforms_json.init()
 db = MongoEngine(app)
 login_manager = LoginManager()
@@ -18,6 +31,8 @@ login_manager.init_app(app)
 
 
 connection()
+
+
 
 class Player(db.EmbeddedDocument):
     playerId = db.StringField(required=False, max_length=36)
@@ -30,6 +45,7 @@ class GameSession(db.Document):
     gameWinner = db.StringField(max_length=25)
 
 class GameUser(UserMixin,db.Document):
+    user_id = db.StringField()
     username = db.StringField()
     password = db.StringField()
     email = db.StringField()
@@ -39,6 +55,14 @@ class RegistrationForm(Form):
     username = StringField()
     password = PasswordField()
     email = StringField()
+
+@jwt.user_claims_loader
+def add_claims_to_access_token(user):
+    return {'user_id': user.user_id}
+
+@jwt.user_identity_loader
+def user_identity_lookup(user):
+    return user.username
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -62,7 +86,9 @@ def register():
             if existing_user is None:
                 print("Usuario no existe, creando usuario")
                 hashpass = generate_password_hash(form.password.data,method='sha256')
-                newUser = GameUser(form.username.data,hashpass,form.email.data).save()
+                userId = str(uuid.uuid1())
+                newUser = GameUser(userId,form.username.data,hashpass,form.email.data)
+                newUser.save()
                 return jsonify("Creacion completada")
             else:
                 return jsonify("Usuario ya existe")
@@ -84,8 +110,10 @@ def login():
             if check_user:
                 print("Usuario existe, revisando contraseña")
                 if check_password_hash(check_user['password'], form.password.data):
-                    login_user(check_user)
-                    return jsonify("Logeado")
+                    access_token = create_access_token(identity=check_user)
+
+                    ret = {'access_token': access_token}
+                    return jsonify(ret), 200
             else:
                 return jsonify("Error")
         else:
@@ -93,7 +121,16 @@ def login():
     return jsonify("Register")
 
 
+@app.route('/protected', methods=['GET'])
+@jwt_required
+def protected():
+    ret = {
+        'current_identity': get_jwt_identity()
+    }
+    return jsonify(ret), 200
+
 @app.route('/gameSessionInit', methods=['POST'])
+@jwt_required
 def postSession():
     createdSession = createSession()
     saveSession(createdSession)
@@ -102,12 +139,14 @@ def postSession():
     return jsonify(createdSession)
 
 @app.route('/sessionUpdate/<sessionId>', methods=['POST'])
+@jwt_required
 def putSession(sessionId):
     sessionDict = request.form.to_dict()
     updatedSession = updateSession(sessionId,sessionDict)
     return updatedSession
 
 @app.route('/getGameSessions/<sessionId>', methods=['GET'])
+@jwt_required
 def getSession(sessionId):
     session = findSession(sessionId)
     del session['_id']
