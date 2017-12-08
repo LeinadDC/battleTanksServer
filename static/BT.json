@@ -1,9 +1,0 @@
-{
-"TOTAL_MEMORY": 268435456,
-"dataUrl": "BT.data.unityweb",
-"asmCodeUrl": "BT.asm.code.unityweb",
-"asmMemoryUrl": "BT.asm.memory.unityweb",
-"asmFrameworkUrl": "BT.asm.framework.unityweb",
-"splashScreenStyle": "Dark",
-"backgroundColor": "#231F20"
-}
