@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from flask import Flask, render_template, request,jsonify,json
+from flask import Flask, render_template
 from flask_mongoengine import MongoEngine
 from flask_jwt_extended import (
     JWTManager, jwt_required, create_access_token,
@@ -8,10 +8,8 @@ from flask_jwt_extended import (
 )
 
 from mongoengine import *
-from werkzeug.security import *
 import wtforms_json
 
-import uuid
 from db import connection
 from flask_login import LoginManager
 
@@ -78,18 +76,4 @@ def getSession(sessionId):
     return game.getSession(sessionId)
 
 
-def createSession():
-    return game.createSession()
 
-
-def converToJson(sessionDict):
-    return game.converToJson(sessionDict)
-
-def updateSession(gameId,jsonData):
-    return game.updateSession(gameId,jsonData)
-
-def saveSession(jsonData):
-    return game.saveSession(jsonData)
-
-def findSession(gameId):
-    return game.findSession(gameId)

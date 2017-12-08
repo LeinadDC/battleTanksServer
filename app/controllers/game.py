@@ -13,7 +13,6 @@ connection()
 def postSession():
     createdSession = createSession()
     saveSession(createdSession)
-    print("PRIMER POST")
     print (createdSession)
     return jsonify(createdSession)
 
@@ -26,7 +25,6 @@ def putSession(sessionId):
 def getSession(sessionId):
     session = findSession(sessionId)
     del session['_id']
-    print("ULTIMO GET")
     print(session)
     return jsonify(session)
 
@@ -46,7 +44,6 @@ def converToJson(sessionDict):
 
 def updateSession(gameId,jsonData):
     parsedJson = converToJson(jsonData)
-    print("ESTE ES EL DE UPDATE")
     GameSession.objects()
     print(parsedJson)
     ##Mejorar este método de actualización
